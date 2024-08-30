@@ -12,7 +12,6 @@ import useAppwrite from "../../hooks/useAppwrite";
 const Bookmark = () => {
   const { data: posts, refetchData } = useAppwrite(getCollectVideos);
   const [refreshing, setRefreshing] = useState(false);
-  let query = "";
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -36,10 +35,7 @@ const Bookmark = () => {
               Saved Videos
             </Text>
             <View className="mt-6 mb-8">
-              <SearchInput
-                value={query}
-                placeholder="Search your saved videos"
-              />
+              <SearchInput placeholder="Search your saved videos" />
             </View>
           </View>
         )}
