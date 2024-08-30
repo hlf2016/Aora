@@ -12,15 +12,41 @@ import { useState, useRef } from "react";
 import { Video, ResizeMode } from "expo-av";
 import { router } from "expo-router";
 
-const VideoCard = ({ post: { video, thumbnail, title, creator } }) => {
+import { collectVideo } from "../lib/appwrite";
+
+const VideoCard = ({ post, isCollected = false }) => {
+  let { video, thumbnail, title, creator } = post;
   // console.log("creator", creator);
+  console.log("post", post.users);
   video = "https://www.w3schools.com/html/mov_bbb.mp4";
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [position, setPosition] = useState({});
   const menuRef = useRef(null);
 
-  console.log("isDropDownVisible", isDropdownVisible);
-  // console.log(menuRef.current);
+  const showActions = () => {
+    if (!visible) {
+      // console.log(menuRef.current);
+      // fx 和 fy: 组件相对于父元素的左上角位置。
+      // width 和 height: 组件的宽度和高度。
+      // px 和 py: 组件相对于整个屏幕的左上角位置（绝对位置）。
+      menuRef.current.measure((fx, fy, width, height, px, py) => {
+        setPosition({ right: 15, top: py + height + 10 });
+      });
+      setVisible(true);
+    }
+  };
+
+  const collect = async () => {
+    // 这里要先隐藏 api 请求比较慢会造成延迟
+    setVisible(false);
+    await collectVideo(post);
+  };
+
+  const delPost = (id) => {
+    console.log(id);
+    setVisible(false);
+  };
   return (
     <View className="items-center px-4 mb-14">
       <View className="flex-row items-start gap-3">
@@ -60,7 +86,7 @@ const VideoCard = ({ post: { video, thumbnail, title, creator } }) => {
             </Text>
           </View>
         </View>
-        <TouchableOpacity className="pt-2">
+        <TouchableOpacity className="pt-2" onPress={() => showActions()}>
           <Image
             ref={menuRef}
             source={icons.menu}
@@ -68,6 +94,51 @@ const VideoCard = ({ post: { video, thumbnail, title, creator } }) => {
             resizeMode="contain"
           />
         </TouchableOpacity>
+        {visible && (
+          <Modal
+            visible={visible}
+            transparent={true}
+            animationType="fade"
+            // 适用于 安卓 返回按键 ios 不适用
+            onRequestClose={() => setVisible(false)}
+          >
+            <TouchableOpacity
+              onPressOut={() => setVisible(false)}
+              activeOpacity={1}
+              className="flex-1"
+            >
+              <View
+                className={`bg-primary py-3 px-6 rounded-md space-y-3 justify-center items-center absolute border-black-100 border-2`}
+                style={position}
+              >
+                <TouchableOpacity
+                  onPress={isCollected ? () => {} : collect}
+                  className="flex-row gap-1 w-[80px] justify-start items-center"
+                >
+                  <Image
+                    source={icons.bookmark}
+                    className="w-3 h-3"
+                    resizeMode="contain"
+                  />
+                  <Text className="text-gray-100 font-pmedium">
+                    {isCollected ? "Saved" : "Save"}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={delPost}
+                  className="flex-row gap-1 w-[80px] justify-start items-center"
+                >
+                  <Image
+                    source={icons.bookmark}
+                    className="w-3 h-3"
+                    resizeMode="contain"
+                  />
+                  <Text className="text-gray-100 font-pmedium">Delete</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          </Modal>
+        )}
       </View>
       {isPlaying ? (
         <Video

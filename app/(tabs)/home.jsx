@@ -11,11 +11,7 @@ import useAppwrite from "../../hooks/useAppwrite";
 import VideoCard from "../../components/VideoCard";
 
 const Home = () => {
-  const {
-    data: posts,
-    isLoading,
-    refetchData: refetchPosts,
-  } = useAppwrite(getAllPosts);
+  const { data: posts, refetchData: refetchPosts } = useAppwrite(getAllPosts);
 
   const { data: latestPosts } = useAppwrite(getLatestPosts);
 
