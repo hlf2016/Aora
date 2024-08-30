@@ -17,7 +17,7 @@ import { collectVideo } from "../lib/appwrite";
 const VideoCard = ({ post, isCollected = false }) => {
   let { video, thumbnail, title, creator } = post;
   // console.log("creator", creator);
-  console.log("post", post.users);
+  // console.log("post", post.users);
   video = "https://www.w3schools.com/html/mov_bbb.mp4";
   const [isPlaying, setIsPlaying] = useState(false);
   const [visible, setVisible] = useState(false);
